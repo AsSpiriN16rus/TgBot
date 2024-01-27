@@ -45,13 +45,13 @@ public class SubscribeCommand implements IBotCommand {
                 answer.setText("/subscribe [число]");
                 absSender.execute(answer);
             }else {
-                String price = "0";
+                Integer price = 0;
                 int i = 0;
                 for (String split : textSplit){
                     if (i != 1){
                         i++;
                     }else {
-                        price = split;
+                        price = Integer.parseInt(split);
                     }
                 }
                 userRepository.addPrice(idUser, price);

@@ -10,6 +10,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.UUID;
+
 
 /**
  * Обработка команды начала работы с ботом
@@ -37,7 +39,8 @@ public class StartCommand implements IBotCommand {
         String idUser = message.getFrom().getId().toString();
         boolean userIsExists = userRepository.userIsExists(idUser);
         if (!userIsExists){
-            userRepository.addUser(idUser);
+            String uuid = UUID.randomUUID() + idUser;
+            userRepository.addUser(idUser, uuid);
         }
 
         SendMessage answer = new SendMessage();

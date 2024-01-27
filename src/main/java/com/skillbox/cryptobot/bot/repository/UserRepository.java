@@ -1,8 +1,11 @@
 package com.skillbox.cryptobot.bot.repository;
 
+import com.skillbox.cryptobot.bot.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import java.util.List;
 
 @Repository
 public class UserRepository
@@ -23,13 +26,13 @@ public class UserRepository
         }
     }
 
-    public void addUser(String idUser){
+    public void addUser(String idUser, String uuid){
         this.jdbcTemplate.update(
-                "insert into subscribers (id) values (?)",
-                idUser);
+                "insert into subscribers (id,uuid) values (?,?)",
+                idUser,uuid);
     }
 
-    public void addPrice(String idUser, String price){
+    public void addPrice(String idUser, Integer price){
         this.jdbcTemplate.update(
                 "UPDATE subscribers SET price = ? where id = ?;",
                 price,idUser);
@@ -46,5 +49,24 @@ public class UserRepository
         this.jdbcTemplate.update(
                 "UPDATE subscribers SET price = null where id = ?;",
                 idUser);
+    }
+
+    public List<User> getUserNotification(Double price){
+        return this.jdbcTemplate.query("select * from subscribers where price > " + price + "", UserRowMapper);
+    }
+
+    private final RowMapper<User> UserRowMapper = (resultSet, rowNum) -> {
+        User user = new User();
+        user.setUuid(resultSet.getString("uuid"));
+        user.setId(resultSet.getString("id"));
+        user.setPrice(resultSet.getBigDecimal("price"));
+        user.setLast_notification(resultSet.getString("last_notification"));
+        return user;
+    };
+
+    public void updateLastNotification(String idUser,String time){
+        this.jdbcTemplate.update(
+                "UPDATE subscribers SET last_notification = ? where id = ?;",
+                time,idUser);
     }
 }
